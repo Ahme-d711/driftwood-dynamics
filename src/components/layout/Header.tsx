@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Search, Menu, X, User } from "lucide-react";
 import { useCart } from "@/features/cart/CartProvider";
+import { ThemeToggle } from "../ThemeToggle";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -44,6 +45,7 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <button className="p-2 rounded-full hover:bg-secondary transition-colors" aria-label="Search">
               <Search className="h-5 w-5 text-muted-foreground" />
             </button>

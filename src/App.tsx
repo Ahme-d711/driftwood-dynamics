@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { lazy, Suspense } from "react";
+import { ThemeProvider } from "next-themes";
 
 const Index = lazy(() => import("./pages/Index"));
 const Products = lazy(() => import("./pages/Products"));
@@ -36,8 +37,8 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="dark">
-            <div className="min-h-screen bg-background text-foreground">
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
               <Header />
               <Suspense fallback={<PageLoader />}>
                 <Routes>
@@ -56,7 +57,7 @@ const App = () => (
               <MobileNav />
               <div className="h-16 md:hidden" />
             </div>
-          </div>
+          </ThemeProvider>
         </BrowserRouter>
       </CartProvider>
     </TooltipProvider>

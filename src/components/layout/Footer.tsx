@@ -6,9 +6,9 @@ export function Footer() {
       <div className="section-padding py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src="/logo.png" alt="Zaha Logo" className="h-8 w-auto" />
-              <span className="font-display text-xl font-semibold tracking-tight">Zaha</span>
+            <Link to="/" className="flex items-center mb-4">
+              <img src="/logo.png" alt="Zaha Logo" className="h-16 w-auto" />
+              <span className="font-display text-xl font-semibold tracking-tight text-accent">Zaha</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Premium products curated for the modern lifestyle.
