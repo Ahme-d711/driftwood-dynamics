@@ -24,11 +24,9 @@ export function Header() {
         className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-border/30"
       >
         <div className="section-padding flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
-              <span className="font-display text-sm font-bold text-accent-foreground">L</span>
-            </div>
-            <span className="font-display text-xl font-semibold tracking-tight">Luxe</span>
+          <Link to="/" className="flex items-center">
+            <img src="/logo.png" alt="Zaha Logo" className="h-16 w-auto" />
+            <span className="font-display text-2xl font-semibold tracking-tight text-accent">Zaha</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -49,9 +47,9 @@ export function Header() {
             <button className="p-2 rounded-full hover:bg-secondary transition-colors" aria-label="Search">
               <Search className="h-5 w-5 text-muted-foreground" />
             </button>
-            <button className="p-2 rounded-full hover:bg-secondary transition-colors" aria-label="Account">
+            <Link to="/profile" className="p-2 rounded-full hover:bg-secondary transition-colors" aria-label="Account">
               <User className="h-5 w-5 text-muted-foreground" />
-            </button>
+            </Link>
             <Link to="/cart" className="relative p-2 rounded-full hover:bg-secondary transition-colors" aria-label="Cart">
               <ShoppingBag className="h-5 w-5 text-muted-foreground" />
               <AnimatePresence>
