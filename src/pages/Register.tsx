@@ -17,12 +17,20 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { authService } from "@/api/auth.service";
+import { useAuthStore } from "@/store/use-auth-store";
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+    ),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
@@ -33,7 +41,9 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -47,9 +57,33 @@ const Register = () => {
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
-    console.log("Register data:", data);
-    toast.success("Account created successfully!");
-    setTimeout(() => navigate("/login"), 1500);
+    setIsLoading(true);
+    try {
+      const response = await authService.register({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+      });
+
+      if (response.success) {
+        toast.success(response.message || "Account created successfully!");
+        // We set auth but since they aren't verified, maybe we should just redirect to login?
+        // The backend returns a token, so we can set it.
+        if (response.data?.user) {
+          setAuth(response.data.user);
+        }
+        
+        // In a real app, we'd go to a verification page. 
+        // For now, let's go to login as per original design, or stay on current if we want them to see the message.
+        setTimeout(() => navigate("/login"), 2000);
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast.error(error.message || "Failed to create account. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const containerVariants = {
@@ -230,10 +264,16 @@ const Register = () => {
                   <Button
                     type="submit"
                     className="w-full h-12 text-lg font-semibold bg-accent hover:bg-accent/90 text-white transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2"
-                    disabled={form.formState.isSubmitting}
+                    disabled={isLoading}
                   >
-                    Create Account
-                    <ArrowRight className="w-5 h-5 ml-1" />
+                    {isLoading ? (
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Create Account
+                        <ArrowRight className="w-5 h-5 ml-1" />
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               </form>
