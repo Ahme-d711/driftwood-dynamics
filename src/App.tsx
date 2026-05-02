@@ -18,6 +18,12 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const DashboardProducts = lazy(() => import("./pages/dashboard/DashboardProducts"));
+const DashboardUsers = lazy(() => import("./pages/dashboard/DashboardUsers"));
+const DashboardCategories = lazy(() => import("./pages/dashboard/DashboardCategories"));
+const DashboardOrders = lazy(() => import("./pages/dashboard/DashboardOrders"));
+const DashboardSettings = lazy(() => import("./pages/dashboard/DashboardSettings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -50,6 +56,12 @@ const App = () => (
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/dashboard/products" element={<DashboardProducts />} />
+                  <Route path="/dashboard/customers" element={<DashboardUsers />} />
+                  <Route path="/dashboard/categories" element={<DashboardCategories />} />
+                  <Route path="/dashboard/orders" element={<DashboardOrders />} />
+                  <Route path="/dashboard/settings" element={<DashboardSettings />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
