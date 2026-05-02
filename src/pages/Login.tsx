@@ -16,18 +16,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+import { loginSchema, LoginFormValues } from "@/schemas/auth.schema";
 
-const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const { login, isLoading } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -38,9 +33,7 @@ const Login = () => {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    console.log("Login data:", data);
-    toast.success("Login successful!");
-    setTimeout(() => navigate("/"), 1500);
+    await login(data);
   };
 
   return (
@@ -148,10 +141,16 @@ const Login = () => {
                   <Button
                     type="submit"
                     className="w-full h-12 text-lg font-semibold bg-accent hover:bg-accent/90 text-white transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2"
-                    disabled={form.formState.isSubmitting}
+                    disabled={isLoading}
                   >
-                    Sign In
-                    <ArrowRight className="w-5 h-5 ml-1" />
+                    {isLoading ? (
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Sign In
+                        <ArrowRight className="w-5 h-5 ml-1" />
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               </form>

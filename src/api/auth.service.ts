@@ -21,6 +21,14 @@ export const authService = {
   getCurrentUser: async (): Promise<ApiResponse<{ user: User }>> => {
     return apiClient.get<unknown, ApiResponse<{ user: User }>>(ENDPOINTS.AUTH.ME);
   },
+
+  verify: async (data: { email?: string; phone?: string; code: string }): Promise<ApiResponse<{ user: User }>> => {
+    return apiClient.post<unknown, ApiResponse<{ user: User }>>(ENDPOINTS.AUTH.VERIFY, data);
+  },
+
+  resendVerification: async (data: { email?: string; phone?: string }): Promise<ApiResponse<void>> => {
+    return apiClient.post<unknown, ApiResponse<void>>(ENDPOINTS.AUTH.RESEND_VERIFICATION, data);
+  },
 };
 
 

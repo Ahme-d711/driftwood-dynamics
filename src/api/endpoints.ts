@@ -8,6 +8,8 @@ export const ENDPOINTS = {
     REGISTER: '/auth/register',
     LOGOUT: '/auth/logout',
     ME: '/auth/me',
+    VERIFY: '/auth/verify',
+    RESEND_VERIFICATION: '/auth/resend-verification',
   },
   USERS: {
     BASE: '/users',
