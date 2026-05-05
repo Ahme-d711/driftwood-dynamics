@@ -33,5 +33,10 @@ export const ENDPOINTS = {
     LIST: '/products',
     DETAILS: (id: string) => `/products/${id}`,
   },
+  VENDOR: {
+    STATS: '/vendor/stats',
+    PRODUCTS: '/vendor/products',
+    ORDERS: '/vendor/orders',
+  },
   // Add more as needed
 } as const;

@@ -166,13 +166,11 @@ export const ProductsPage = () => {
         description="Create a product from dashboard table."
         form={form}
         setForm={setForm}
-        categories={categories}
         isSubmitting={createProductMutation.isPending}
         submitLabel="Create Product"
         onSubmit={submitAddProduct}
         onMainImageChange={setMainImageFile}
         onGalleryChange={setGalleryFiles}
-        showCategoryField
         showMainImageField
       />
 
@@ -183,13 +181,11 @@ export const ProductsPage = () => {
         description="Update key product fields."
         form={form}
         setForm={setForm}
-        categories={categories}
         isSubmitting={updateProductMutation.isPending}
         submitLabel="Save Changes"
         onSubmit={submitEditProduct}
         onMainImageChange={setMainImageFile}
         onGalleryChange={setGalleryFiles}
-        showCategoryField={false}
         showMainImageField={false}
       />
     </DashboardLayout>

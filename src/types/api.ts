@@ -13,7 +13,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'user' | 'vendor' | 'super_admin';
   picture?: string;
   phone?: string;
   address?: string;

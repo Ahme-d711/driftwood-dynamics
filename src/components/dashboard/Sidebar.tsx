@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useAuthStore } from "@/store/use-auth-store";
 
-const menuItems = [
+const adminMenuItems = [
   { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
   { icon: ShoppingBag, label: "Orders", path: "/dashboard/orders" },
   { icon: Package, label: "Products", path: "/dashboard/products" },
@@ -24,8 +25,18 @@ const menuItems = [
   { icon: Settings, label: "Settings", path: "/dashboard/settings" },
 ];
 
+const vendorMenuItems = [
+  { icon: LayoutDashboard, label: "Overview", path: "/vendor" },
+  { icon: ShoppingBag, label: "My Orders", path: "/vendor/orders" },
+  { icon: Package, label: "My Products", path: "/vendor/products" },
+  { icon: Settings, label: "Shop Settings", path: "/profile" },
+];
+
 export const Sidebar = () => {
   const location = useLocation();
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
+  const menuItems = isAdmin ? adminMenuItems : vendorMenuItems;
 
   return (
     <div className="w-64 h-screen bg-card border-r border-border flex flex-col sticky top-0">
