@@ -1,4 +1,4 @@
-import { OrdersPage } from "@/features/dashboard/orders/components/OrdersPage";
+import { OrdersPage } from "@/features/dashboard/orders/pages/OrdersPage";
 
 const DashboardOrders = () => <OrdersPage />;
 

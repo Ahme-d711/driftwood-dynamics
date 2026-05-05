@@ -1,4 +1,4 @@
-import { UsersPage } from "@/features/dashboard/users/components/UsersPage";
+import { UsersPage } from "@/features/dashboard/users/pages/UsersPage";
 
 const DashboardUsers = () => <UsersPage />;
 

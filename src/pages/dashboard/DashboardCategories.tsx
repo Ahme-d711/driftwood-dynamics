@@ -1,4 +1,4 @@
-import { CategoriesPage } from "@/features/dashboard/categories/components/CategoriesPage";
+import { CategoriesPage } from "@/features/dashboard/categories/pages/CategoriesPage";
 
 const DashboardCategories = () => <CategoriesPage />;
 

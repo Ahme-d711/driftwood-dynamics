@@ -1,4 +1,4 @@
-import { SettingsPage } from "@/features/dashboard/settings/components/SettingsPage";
+import { SettingsPage } from "@/features/dashboard/settings/pages/SettingsPage";
 
 const DashboardSettings = () => <SettingsPage />;
 
