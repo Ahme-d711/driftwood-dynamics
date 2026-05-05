@@ -2,6 +2,7 @@ import { CategoryListItem } from "@/api/dashboard-management.service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { resolveMediaUrl } from "@/lib/media-url";
 import { ChevronRight, Edit, Loader2, Search, Trash2 } from "lucide-react";
 
 interface CategoriesGridProps {
@@ -49,7 +50,7 @@ export const CategoriesGrid = ({
         <Card key={category._id} className="glass-card border-border/50 group hover:border-accent/30 transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-6">
-              <img src={category.image} alt={category.nameEn} className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-105 transition-transform" />
+              <img src={resolveMediaUrl(category.image)} alt={(category as { name?: string; nameEn?: string }).name ?? category.nameEn} className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-105 transition-transform" />
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-accent" onClick={() => onEdit(category._id)}>
                   <Edit className="w-4 h-4" />
@@ -60,8 +61,10 @@ export const CategoriesGrid = ({
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-bold font-playfair">{category.nameEn}</h3>
-              <p className="text-muted-foreground text-sm mb-4">{category.nameAr}</p>
+              <h3 className="text-xl font-bold font-playfair">{(category as { name?: string; nameEn?: string }).name ?? category.nameEn}</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                {(category as { description?: string; descriptionEn?: string }).description ?? category.descriptionEn ?? "-"}
+              </p>
               <div className="flex items-center gap-4 mt-6">
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Products</p>

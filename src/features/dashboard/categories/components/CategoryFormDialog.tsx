@@ -40,20 +40,18 @@ export const CategoryFormDialog = ({
         <DialogDescription>{description}</DialogDescription>
       </DialogHeader>
       <div className="grid gap-3">
-        <Label>Name (EN)</Label>
-        <Input value={form.nameEn} onChange={(e) => setForm((p) => ({ ...p, nameEn: e.target.value }))} />
-        <Label>Name (AR)</Label>
-        <Input value={form.nameAr} onChange={(e) => setForm((p) => ({ ...p, nameAr: e.target.value }))} />
-        {!minimal && (
-          <>
-            <Label>Description (EN)</Label>
-            <Textarea value={form.descriptionEn} onChange={(e) => setForm((p) => ({ ...p, descriptionEn: e.target.value }))} />
-            <Label>Description (AR)</Label>
-            <Textarea value={form.descriptionAr} onChange={(e) => setForm((p) => ({ ...p, descriptionAr: e.target.value }))} />
-            <Label>Category Image</Label>
-            <Input type="file" accept="image/*" onChange={(e) => onImageChange?.(e.target.files?.[0] ?? null)} />
-          </>
-        )}
+        <Label>Name</Label>
+        <Input value={form.name ?? ""} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
+        <Label>Description</Label>
+        <Textarea value={form.description ?? ""} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
+        <Label>Priority</Label>
+        <Input type="number" value={form.priority ?? 0} onChange={(e) => setForm((p) => ({ ...p, priority: Number(e.target.value) }))} />
+        <Label>Visible</Label>
+        <Input type="checkbox" checked={form.isShow ?? false} onChange={(e) => setForm((p) => ({ ...p, isShow: e.target.checked }))} />
+        {!minimal && <>
+          <Label>Category Image</Label>
+          <Input type="file" accept="image/*" onChange={(e) => onImageChange?.(e.target.files?.[0] ?? null)} />
+        </>}
       </div>
       <DialogFooter>
         <Button onClick={onSubmit} disabled={isSubmitting}>

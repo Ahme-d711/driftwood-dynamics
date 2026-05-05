@@ -10,10 +10,8 @@ import { CategoryFormState, defaultCategoryFormState } from "../components/categ
 
 const toPayload = (form: CategoryFormState, imageFile: File | null) => {
   const payload = new FormData();
-  payload.append("nameEn", form.nameEn);
-  payload.append("nameAr", form.nameAr);
-  payload.append("descriptionEn", form.descriptionEn);
-  payload.append("descriptionAr", form.descriptionAr);
+  payload.append("name", form.name);
+  payload.append("description", form.description);
   payload.append("priority", String(form.priority));
   payload.append("isShow", String(form.isShow));
   if (imageFile) payload.append("image", imageFile);
@@ -83,10 +81,11 @@ export const CategoriesPage = () => {
             const current = categories.find((c) => c._id === id);
             if (!current) return;
             setForm({
-              nameEn: current.nameEn ?? "",
-              nameAr: current.nameAr ?? "",
-              descriptionEn: current.descriptionEn ?? "",
-              descriptionAr: current.descriptionAr ?? "",
+              name: (current as { name?: string; nameEn?: string }).name ?? current.nameEn ?? "",
+              description:
+                (current as { description?: string; descriptionEn?: string }).description ??
+                current.descriptionEn ??
+                "",
               priority: current.priority ?? 0,
               isShow: current.isShow ?? true,
             });

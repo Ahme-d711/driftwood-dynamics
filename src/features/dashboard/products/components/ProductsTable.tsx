@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 interface ProductsTableProps {
   products: ProductListItem[];
@@ -94,7 +95,7 @@ export const ProductsTable = ({
                 <tr key={product._id} className="group hover:bg-muted/30 transition-colors">
                   <td className="py-4">
                     <div className="flex items-center gap-3">
-                      <img src={product.mainImage} alt={product.nameEn} className="w-10 h-10 rounded-lg object-cover" />
+                      <img src={resolveMediaUrl(product.mainImage)} alt={product.nameEn} className="w-10 h-10 rounded-lg object-cover" />
                       <span className="font-medium text-sm">{product.nameEn}</span>
                     </div>
                   </td>

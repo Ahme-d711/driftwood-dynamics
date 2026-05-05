@@ -1,17 +1,18 @@
 export interface CategoryFormState {
-  nameEn: string;
-  nameAr: string;
-  descriptionEn: string;
-  descriptionAr: string;
+  name: string;
+  description: string;
   priority: number;
   isShow: boolean;
+  // Backward-compatible optional aliases to avoid stale TS cache errors.
+  nameEn?: string;
+  nameAr?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
 }
 
 export const defaultCategoryFormState: CategoryFormState = {
-  nameEn: "",
-  nameAr: "",
-  descriptionEn: "",
-  descriptionAr: "",
+  name: "",
+  description: "",
   priority: 0,
   isShow: true,
 };

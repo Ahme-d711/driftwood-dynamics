@@ -124,6 +124,3 @@ export const UsersPage = () => {
     </DashboardLayout>
   );
 };
-import { UsersPage as UsersPageComponent } from "../components/UsersPage";
-
-export const UsersPage = () => <UsersPageComponent />;

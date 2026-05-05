@@ -6,6 +6,8 @@ interface CategoryDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   isLoading: boolean;
   category?: {
+    name?: string;
+    description?: string;
     nameEn?: string;
     nameAr?: string;
   };
@@ -27,8 +29,8 @@ export const CategoryDetailsDialog = ({
         <div className="py-6 flex justify-center"><Loader2 className="h-5 w-5 animate-spin text-accent" /></div>
       ) : (
         <div className="space-y-2 text-sm">
-          <p><span className="font-semibold">English Name:</span> {category?.nameEn}</p>
-          <p><span className="font-semibold">Arabic Name:</span> {category?.nameAr}</p>
+          <p><span className="font-semibold">Name:</span> {category?.name ?? category?.nameEn}</p>
+          <p><span className="font-semibold">Description:</span> {category?.description ?? "-"}</p>
         </div>
       )}
     </DialogContent>
