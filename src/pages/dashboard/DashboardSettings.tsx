@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Globe, Bell, Shield, Wallet } from "lucide-react";
+import { Save, Globe, Bell, Shield, Wallet, Loader2 } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { dashboardManagementService } from "@/api/dashboard-management.service";
 
 const DashboardSettings = () => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["dashboard-settings"],
+    queryFn: () => dashboardManagementService.getSettings(),
+  });
+
+  const [form, setForm] = useState({
+    contactEmail: "",
+    contactPhone: "",
+    shippingCost: 0,
+    taxRate: 0,
+    freeShippingThreshold: 0,
+    currency: "EGP",
+  });
+
+  useEffect(() => {
+    if (!data?.data) return;
+    setForm({
+      contactEmail: data.data.contactEmail ?? "",
+      contactPhone: data.data.contactPhone ?? "",
+      shippingCost: data.data.shippingCost ?? 0,
+      taxRate: data.data.taxRate ?? 0,
+      freeShippingThreshold: data.data.freeShippingThreshold ?? 0,
+      currency: data.data.currency ?? "EGP",
+    });
+  }, [data]);
+
+  const updateMutation = useMutation({
+    mutationFn: () => dashboardManagementService.updateSettings(form),
+  });
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -17,11 +49,21 @@ const DashboardSettings = () => {
             <h1 className="text-3xl font-bold font-playfair tracking-tight">Settings</h1>
             <p className="text-muted-foreground mt-1">Configure your store's general settings and preferences.</p>
           </div>
-          <Button className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20">
+          <Button
+            className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20"
+            onClick={() => updateMutation.mutate()}
+            disabled={updateMutation.isPending}
+          >
             <Save className="w-4 h-4 mr-2" />
-            Save Changes
+            {updateMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </div>
+        {isLoading && (
+          <div className="py-6 flex justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-accent" />
+          </div>
+        )}
+        {isError && <p className="text-sm text-destructive">Failed to load settings.</p>}
 
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="bg-muted/50 p-1 rounded-xl w-full justify-start overflow-x-auto">
@@ -46,12 +88,22 @@ const DashboardSettings = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="store-email">Contact Email</Label>
-                      <Input id="store-email" defaultValue="info@zaha.com" className="bg-muted/30" />
+                      <Input
+                        id="store-email"
+                        value={form.contactEmail}
+                        onChange={(e) => setForm((prev) => ({ ...prev, contactEmail: e.target.value }))}
+                        className="bg-muted/30"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="store-desc">Store Description</Label>
-                    <Input id="store-desc" defaultValue="The ultimate luxury shopping experience." className="bg-muted/30" />
+                    <Label htmlFor="store-phone">Contact Phone</Label>
+                    <Input
+                      id="store-phone"
+                      value={form.contactPhone}
+                      onChange={(e) => setForm((prev) => ({ ...prev, contactPhone: e.target.value }))}
+                      className="bg-muted/30"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -64,18 +116,43 @@ const DashboardSettings = () => {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Primary Language</Label>
-                      <Button variant="outline" className="w-full justify-between border-border/50">
-                        Arabic (Egypt)
-                        <Globe className="w-4 h-4 text-muted-foreground" />
-                      </Button>
+                      <Label htmlFor="tax-rate">Tax Rate (%)</Label>
+                      <Input
+                        id="tax-rate"
+                        type="number"
+                        value={form.taxRate}
+                        onChange={(e) => setForm((prev) => ({ ...prev, taxRate: Number(e.target.value) }))}
+                        className="bg-muted/30"
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label>Currency</Label>
-                      <Button variant="outline" className="w-full justify-between border-border/50">
-                        EGP (£)
-                        <Wallet className="w-4 h-4 text-muted-foreground" />
-                      </Button>
+                      <Label htmlFor="shipping-cost">Shipping Cost</Label>
+                      <Input
+                        id="shipping-cost"
+                        type="number"
+                        value={form.shippingCost}
+                        onChange={(e) => setForm((prev) => ({ ...prev, shippingCost: Number(e.target.value) }))}
+                        className="bg-muted/30"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="free-shipping-threshold">Free Shipping Threshold</Label>
+                      <Input
+                        id="free-shipping-threshold"
+                        type="number"
+                        value={form.freeShippingThreshold}
+                        onChange={(e) => setForm((prev) => ({ ...prev, freeShippingThreshold: Number(e.target.value) }))}
+                        className="bg-muted/30"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="currency">Currency</Label>
+                      <Input
+                        id="currency"
+                        value={form.currency}
+                        onChange={(e) => setForm((prev) => ({ ...prev, currency: e.target.value }))}
+                        className="bg-muted/30"
+                      />
                     </div>
                   </div>
                 </CardContent>

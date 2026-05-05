@@ -15,11 +15,21 @@ export const ENDPOINTS = {
     STATS: '/dashboard/stats',
     REVENUE_ANALYTICS: '/dashboard/revenue-analytics',
   },
+  ORDERS: {
+    LIST: '/orders',
+  },
+  CATEGORIES: {
+    LIST: '/categories',
+  },
+  SETTINGS: {
+    BASE: '/settings',
+  },
   USERS: {
     BASE: '/users',
     PROFILE: (id: string) => `/users/${id}`,
   },
   PRODUCTS: {
+    BASE: '/products',
     LIST: '/products',
     DETAILS: (id: string) => `/products/${id}`,
   },
