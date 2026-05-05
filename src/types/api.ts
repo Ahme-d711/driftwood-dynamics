@@ -9,6 +9,49 @@ export interface ApiResponse<T = any> {
   data: T;
 }
 
+export interface ProductImages {
+  main: string;
+  gallery: string[];
+}
+
+export interface ProductFeatures {
+  battery_life: string;
+  noise_cancelling: boolean;
+  audio: string[];
+}
+
+export interface ProductShipping {
+  free_shipping: boolean;
+  condition: string;
+}
+
+export interface Product {
+  _id: string;
+  id: string;
+  name: string;
+  nameEn?: string;
+  nameAr?: string;
+  price: number;
+  old_price: number;
+  discount_percentage: number;
+  rating: number;
+  reviews_count: number;
+  images: ProductImages;
+  mainImage?: string;
+  stock: number;
+  is_best_seller: boolean;
+  features: ProductFeatures;
+  shipping: ProductShipping;
+  warranty: string;
+  returns: string;
+  slug: string;
+  categoryId: string | { _id: string; nameEn: string; nameAr: string };
+  addedBy: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface User {
   _id: string;
   name: string;

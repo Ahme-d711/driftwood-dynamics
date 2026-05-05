@@ -1,5 +1,10 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { CartItem, Product } from "@/types/product";
+import { Product } from "@/types/api";
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
 
 interface CartContextType {
   items: CartItem[];
@@ -17,11 +22,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
   const addItem = useCallback((product: Product) => {
+    const productId = product._id || product.id;
     setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
+      const existing = prev.find((i) => (i.product._id || i.product.id) === productId);
       if (existing) {
         return prev.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+          (i.product._id || i.product.id) === productId ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
       return [...prev, { product, quantity: 1 }];
@@ -29,16 +35,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const removeItem = useCallback((productId: string) => {
-    setItems((prev) => prev.filter((i) => i.product.id !== productId));
+    setItems((prev) => prev.filter((i) => (i.product._id || i.product.id) !== productId));
   }, []);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity <= 0) {
-      setItems((prev) => prev.filter((i) => i.product.id !== productId));
+      setItems((prev) => prev.filter((i) => (i.product._id || i.product.id) !== productId));
       return;
     }
     setItems((prev) =>
-      prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i))
+      prev.map((i) => ((i.product._id || i.product.id) === productId ? { ...i, quantity } : i))
     );
   }, []);
 

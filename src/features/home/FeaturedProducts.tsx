@@ -1,11 +1,17 @@
 import { motion } from "framer-motion";
-import { products } from "@/constants/products";
 import { ProductCard } from "@/features/products/ProductCard";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { productService } from "@/api/product.service";
 
 export function FeaturedProducts() {
-  const featured = products.slice(0, 4);
+  const { data: productsResponse, isLoading, isError } = useQuery({
+    queryKey: ["featured-products"],
+    queryFn: () => productService.getAll({ limit: 4, is_best_seller: true }),
+  });
+
+  const featured = productsResponse?.data?.products ?? [];
 
   return (
     <section className="section-padding py-16">
@@ -28,19 +34,29 @@ export function FeaturedProducts() {
         </Link>
       </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {featured.map((product, i) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
-          >
-            <ProductCard product={product} />
-          </motion.div>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="w-10 h-10 text-accent animate-spin" />
+        </div>
+      ) : isError ? (
+        <div className="text-center py-20 text-destructive">
+          Failed to load featured products.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featured.map((product, i) => (
+            <motion.div
+              key={product._id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+            >
+              <ProductCard product={product as any} />
+            </motion.div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

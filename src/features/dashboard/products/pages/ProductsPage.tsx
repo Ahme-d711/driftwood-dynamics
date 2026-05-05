@@ -18,8 +18,10 @@ const toPayload = (form: ProductFormState, mainImageFile: File | null, galleryFi
   payload.append("price", String(form.price));
   payload.append("old_price", String(form.originalPrice));
   payload.append("discount_percentage", String(Math.max(discountPercentage, 0)));
-  payload.append("rating", String(form.rating));
-  payload.append("reviews_count", String(form.reviews));
+  payload.append("categoryId", form.categoryId);
+  // Rating and reviews are computed by backend logic.
+  payload.append("rating", "0");
+  payload.append("reviews_count", "0");
   payload.append("stock", String(form.stock));
   payload.append("is_best_seller", String(form.isBestSeller));
   payload.append("warranty", form.warranty);
@@ -166,6 +168,7 @@ export const ProductsPage = () => {
         description="Create a product from dashboard table."
         form={form}
         setForm={setForm}
+        categories={categories}
         isSubmitting={createProductMutation.isPending}
         submitLabel="Create Product"
         onSubmit={submitAddProduct}
@@ -181,6 +184,7 @@ export const ProductsPage = () => {
         description="Update key product fields."
         form={form}
         setForm={setForm}
+        categories={categories}
         isSubmitting={updateProductMutation.isPending}
         submitLabel="Save Changes"
         onSubmit={submitEditProduct}

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { resolveMediaUrl } from "@/lib/media-url";
+import { Link } from "react-router-dom";
 
 interface ProductsTableProps {
   products: ProductListItem[];
@@ -115,8 +116,10 @@ export const ProductsTable = ({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem onClick={() => onView(product._id)}>
-                          <Eye className="w-4 h-4 mr-2" /> View
+                        <DropdownMenuItem asChild>
+                          <Link to={`/product/${product._id}`}>
+                            <Eye className="w-4 h-4 mr-2" /> View
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onEdit(product._id)}>
                           <Edit className="w-4 h-4 mr-2" /> Edit

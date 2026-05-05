@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ShoppingBag, Star, Heart } from "lucide-react";
-import { Product } from "@/types/product";
+import { Product } from "@/types/api";
 import { useCart } from "@/features/cart/CartProvider";
 import { toast } from "sonner";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 interface ProductCardProps {
   product: Product;
@@ -12,28 +13,39 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
 
+  // Handle both old and new data structures for resilience
+  const productId = product._id || product.id;
+  const productName = product.nameEn || product.name;
+  const productImage = product.images?.main ? resolveMediaUrl(product.images.main) : (product as any).image;
+  const productPrice = product.price;
+  const productOldPrice = product.old_price || (product as any).originalPrice;
+  const productRating = product.rating || 0;
+  const productReviews = product.reviews_count || (product as any).reviews || 0;
+  const productCategory = typeof product.categoryId === 'object' ? product.categoryId.nameEn : (product as any).category;
+  const productBadge = product.is_best_seller ? "Bestseller" : (product as any).badge;
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product);
-    toast.success(`${product.name} added to cart`);
+    addItem(product as any);
+    toast.success(`${productName} added to cart`);
   };
 
   return (
-    <Link to={`/products/${product.id}`} className="group block">
-      <div className="glass-card-hover rounded-2xl overflow-hidden">
+    <Link to={`/products/${productId}`} className="group block">
+      <div className="glass-card-hover rounded-2xl overflow-hidden h-full flex flex-col">
         {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-secondary/50">
           <img
-            src={product.image}
-            alt={product.name}
+            src={productImage}
+            alt={productName}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
           />
           {/* Badge */}
-          {product.badge && (
-            <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
-              {product.badge}
+          {productBadge && (
+            <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-wider">
+              {productBadge}
             </span>
           )}
           {/* Quick actions */}
@@ -61,20 +73,20 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Info */}
-        <div className="p-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{product.category}</p>
-          <h3 className="font-medium text-sm leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors">
-            {product.name}
+        <div className="p-4 flex-1 flex flex-col">
+          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-1">{productCategory}</p>
+          <h3 className="font-medium text-sm leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors flex-1">
+            {productName}
           </h3>
           <div className="flex items-center gap-1 mb-2">
-            <Star className="h-3.5 w-3.5 fill-accent text-accent" />
-            <span className="text-xs font-medium">{product.rating}</span>
-            <span className="text-xs text-muted-foreground">({product.reviews.toLocaleString()})</span>
+            <Star className="h-3 w-3 fill-accent text-accent" />
+            <span className="text-xs font-bold">{productRating}</span>
+            <span className="text-[10px] text-muted-foreground">({productReviews.toLocaleString()})</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-semibold">${product.price}</span>
-            {product.originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
+            <span className="font-bold text-base">${productPrice.toLocaleString()}</span>
+            {productOldPrice && (
+              <span className="text-xs text-muted-foreground line-through">${productOldPrice.toLocaleString()}</span>
             )}
           </div>
         </div>

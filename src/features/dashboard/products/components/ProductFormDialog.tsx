@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProductFormState } from "./products.types";
+import { CategoryListItem } from "@/api/dashboard-management.service";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface ProductFormDialogProps {
   description: string;
   form: ProductFormState;
   setForm: Dispatch<SetStateAction<ProductFormState>>;
+  categories: CategoryListItem[];
   isSubmitting: boolean;
   submitLabel: string;
   onSubmit: () => void;
@@ -34,6 +36,7 @@ export const ProductFormDialog = ({
   description,
   form,
   setForm,
+  categories,
   isSubmitting,
   submitLabel,
   onSubmit,
@@ -43,6 +46,7 @@ export const ProductFormDialog = ({
 }: ProductFormDialogProps) => {
   const MAX_GALLERY_IMAGES = 4;
   const [mainPreviewUrl, setMainPreviewUrl] = useState<string>("");
+  const [selectedGalleryFiles, setSelectedGalleryFiles] = useState<File[]>([]);
   const [galleryPreviewUrls, setGalleryPreviewUrls] = useState<string[]>([]);
   const [galleryLimitError, setGalleryLimitError] = useState<string>("");
 
@@ -60,13 +64,28 @@ export const ProductFormDialog = ({
   };
 
   const handleGalleryChange = (files: File[]) => {
-    galleryPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-    const limitedFiles = files.slice(0, MAX_GALLERY_IMAGES);
-    if (files.length > MAX_GALLERY_IMAGES) {
+    const mergedFiles = [...selectedGalleryFiles, ...files];
+    const uniqueFiles = mergedFiles.filter(
+      (file, index, arr) =>
+        index ===
+        arr.findIndex(
+          (candidate) =>
+            candidate.name === file.name &&
+            candidate.size === file.size &&
+            candidate.lastModified === file.lastModified
+        )
+    );
+    const limitedFiles = uniqueFiles.slice(0, MAX_GALLERY_IMAGES);
+
+    if (uniqueFiles.length > MAX_GALLERY_IMAGES) {
       setGalleryLimitError(`Maximum ${MAX_GALLERY_IMAGES} images are allowed. First ${MAX_GALLERY_IMAGES} were selected.`);
     } else {
       setGalleryLimitError("");
     }
+
+    setSelectedGalleryFiles(limitedFiles);
+
+    galleryPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
     const urls = limitedFiles.map((file) => URL.createObjectURL(file));
     setGalleryPreviewUrls(urls);
     onGalleryChange(limitedFiles);
@@ -85,6 +104,21 @@ export const ProductFormDialog = ({
             <Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
           </div>
           <div className="space-y-2">
+            <Label>Category</Label>
+            <select
+              value={form.categoryId}
+              onChange={(e) => setForm((p) => ({ ...p, categoryId: e.target.value }))}
+              className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">Select category</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {(category as { name?: string; nameEn?: string }).name ?? category.nameEn}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
             <Label>Price</Label>
             <Input type="number" value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: Number(e.target.value) }))} />
           </div>
@@ -95,14 +129,6 @@ export const ProductFormDialog = ({
           <div className="space-y-2">
             <Label>Stock</Label>
             <Input type="number" value={form.stock} onChange={(e) => setForm((p) => ({ ...p, stock: Number(e.target.value) }))} />
-          </div>
-          <div className="space-y-2">
-            <Label>Rating</Label>
-            <Input type="number" step="0.1" min="0" max="5" value={form.rating} onChange={(e) => setForm((p) => ({ ...p, rating: Number(e.target.value) }))} />
-          </div>
-          <div className="space-y-2">
-            <Label>Reviews Count</Label>
-            <Input type="number" min="0" value={form.reviews} onChange={(e) => setForm((p) => ({ ...p, reviews: Number(e.target.value) }))} />
           </div>
           <div className="space-y-2">
             <Label>Best Seller</Label>

@@ -29,7 +29,6 @@ const vendorMenuItems = [
   { icon: LayoutDashboard, label: "Overview", path: "/vendor" },
   { icon: ShoppingBag, label: "My Orders", path: "/vendor/orders" },
   { icon: Package, label: "My Products", path: "/vendor/products" },
-  { icon: Settings, label: "Shop Settings", path: "/profile" },
 ];
 
 export const Sidebar = () => {
