@@ -24,10 +24,10 @@ export function ProductCard({ product }: ProductCardProps) {
   const productCategory = typeof product.categoryId === 'object' ? product.categoryId.nameEn : (product as any).category;
   const productBadge = product.is_best_seller ? "Bestseller" : (product as any).badge;
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product as any);
+    await addItem(product as any);
     toast.success(`${productName} added to cart`);
   };
 

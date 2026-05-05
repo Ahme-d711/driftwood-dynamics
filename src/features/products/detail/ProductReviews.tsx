@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Star, User, Loader2, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Star, User, Loader2, MessageSquare, Edit2, Trash2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { reviewService } from "@/api/review.service";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,16 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
   });
 
   const reviews = reviewsResponse?.data?.reviews ?? [];
+  const existingReview = reviews.find(r => 
+    (typeof r.userId === 'object' ? r.userId._id : r.userId) === user?._id
+  );
+
+  useEffect(() => {
+    if (existingReview) {
+      setRating(existingReview.rating);
+      setComment(existingReview.comment || "");
+    }
+  }, [existingReview]);
 
   const addReviewMutation = useMutation({
     mutationFn: (data: { productId: string; rating: number; comment?: string }) =>
@@ -30,12 +40,31 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-reviews", productId] });
       queryClient.invalidateQueries({ queryKey: ["product-detail", productId] });
-      setComment("");
-      setRating(5);
       toast.success("Review submitted successfully!");
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to submit review");
+    },
+  });
+
+  const updateReviewMutation = useMutation({
+    mutationFn: (data: { id: string; rating: number; comment?: string }) =>
+      reviewService.update(data.id, { rating: data.rating, comment: data.comment }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["product-reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-detail", productId] });
+      toast.success("Review updated successfully!");
+    },
+  });
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: (id: string) => reviewService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["product-reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-detail", productId] });
+      setRating(5);
+      setComment("");
+      toast.success("Review deleted");
     },
   });
 
@@ -45,7 +74,12 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       toast.error("Please login to submit a review");
       return;
     }
-    addReviewMutation.mutate({ productId, rating, comment });
+    
+    if (existingReview) {
+      updateReviewMutation.mutate({ id: existingReview._id, rating, comment });
+    } else {
+      addReviewMutation.mutate({ productId, rating, comment });
+    }
   };
 
   if (isLoading) {
@@ -85,7 +119,6 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
               </div>
             </div>
 
-            {/* Rating breakdown (Simulated) */}
             <div className="space-y-2">
               {[5, 4, 3, 2, 1].map((star) => {
                 const count = reviews.filter((r) => Math.round(r.rating) === star).length;
@@ -106,10 +139,20 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
             </div>
           </div>
 
-          {/* Add Review Form */}
           {user ? (
             <div className="glass-card rounded-2xl p-6">
-              <h3 className="font-semibold mb-4">Share your thoughts</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">{existingReview ? "Edit your review" : "Share your thoughts"}</h3>
+                {existingReview && (
+                  <button 
+                    onClick={() => deleteReviewMutation.mutate(existingReview._id)}
+                    className="text-destructive hover:text-destructive/80 transition-colors"
+                    title="Delete review"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">Rating:</span>
@@ -139,15 +182,17 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                 />
                 <Button 
                   type="submit" 
-                  disabled={addReviewMutation.isPending}
+                  disabled={addReviewMutation.isPending || updateReviewMutation.isPending}
                   className="w-full bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl"
                 >
-                  {addReviewMutation.isPending ? (
+                  {(addReviewMutation.isPending || updateReviewMutation.isPending) ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : existingReview ? (
+                    <Edit2 className="h-4 w-4 mr-2" />
                   ) : (
                     <MessageSquare className="h-4 w-4 mr-2" />
                   )}
-                  Post Review
+                  {existingReview ? "Update Review" : "Post Review"}
                 </Button>
               </form>
             </div>
@@ -174,10 +219,15 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                 reviews.map((rev) => (
                   <motion.div
                     key={rev._id}
+                    layout
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="glass-card rounded-2xl p-6"
+                    className={`glass-card rounded-2xl p-6 ${
+                      (typeof rev.userId === 'object' ? rev.userId._id : rev.userId) === user?._id 
+                        ? "border-accent/30 bg-accent/5" 
+                        : ""
+                    }`}
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -187,6 +237,9 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                         <div>
                           <p className="font-semibold text-sm">
                             {typeof rev.userId === 'object' ? rev.userId.name : 'User'}
+                            {(typeof rev.userId === 'object' ? rev.userId._id : rev.userId) === user?._id && (
+                              <span className="ml-2 text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded-md uppercase font-bold">You</span>
+                            )}
                           </p>
                           <div className="flex items-center gap-0.5">
                             {[...Array(5)].map((_, i) => (

@@ -65,6 +65,14 @@ export interface Review {
   updatedAt: string;
 }
 
+export interface Wishlist {
+  _id: string;
+  userId: string;
+  products: Product[] | string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface User {
   _id: string;
   name: string;

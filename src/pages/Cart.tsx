@@ -5,7 +5,15 @@ import { useCart } from "@/features/cart/CartProvider";
 import { Button } from "@/components/ui/button";
 
 const Cart = () => {
-  const { items, removeItem, updateQuantity, totalPrice, totalItems } = useCart();
+  const { items, removeItem, updateQuantity, totalPrice, totalItems, isLoading } = useCart();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -68,14 +76,14 @@ const Cart = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1 glass-card rounded-lg">
                         <button
-                          onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                          onClick={() => void updateQuantity(item.product.id, item.quantity - 1, item.size)}
                           className="p-1.5 hover:text-accent transition-colors"
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </button>
                         <span className="px-3 text-sm font-medium">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                          onClick={() => void updateQuantity(item.product.id, item.quantity + 1, item.size)}
                           className="p-1.5 hover:text-accent transition-colors"
                         >
                           <Plus className="h-3.5 w-3.5" />
@@ -84,7 +92,7 @@ const Cart = () => {
                       <div className="flex items-center gap-4">
                         <span className="font-semibold">${(item.product.price * item.quantity).toFixed(2)}</span>
                         <button
-                          onClick={() => removeItem(item.product.id)}
+                          onClick={() => void removeItem(item.product.id, item.size)}
                           className="p-1.5 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />

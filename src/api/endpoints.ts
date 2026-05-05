@@ -38,10 +38,22 @@ export const ENDPOINTS = {
     PRODUCTS: '/vendor/products',
     ORDERS: '/vendor/orders',
   },
+  WISHLIST: {
+    BASE: '/wishlist',
+    TOGGLE: '/wishlist/toggle',
+    CLEAR: '/wishlist/clear',
+  },
   REVIEWS: {
     BASE: '/reviews',
     BY_PRODUCT: (id: string) => `/reviews/product/${id}`,
     TOP: '/reviews/top',
+  },
+  CART: {
+    BASE: "/cart",
+    ADD: "/cart/add",
+    UPDATE: "/cart/update",
+    REMOVE: (productId: string) => `/cart/remove/${productId}`,
+    CLEAR: "/cart/clear",
   },
   // Add more as needed
 } as const;

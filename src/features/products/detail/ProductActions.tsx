@@ -5,6 +5,10 @@ import { toast } from "sonner";
 import { Product } from "@/types/api";
 import { useCart } from "@/features/cart/CartProvider";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { wishlistService } from "@/api/wishlist.service";
+import { useAuthStore } from "@/store/use-auth-store";
+
 interface ProductActionsProps {
   product: Product;
 }
@@ -12,9 +16,40 @@ interface ProductActionsProps {
 export function ProductActions({ product }: ProductActionsProps) {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) addItem(product as any);
+  const { data: wishlistResponse } = useQuery({
+    queryKey: ["wishlist"],
+    queryFn: () => wishlistService.get(),
+    enabled: !!user,
+  });
+
+  const isInWishlist = wishlistResponse?.data?.wishlist?.products?.some(
+    (p: any) => (typeof p === 'string' ? p : p._id) === product._id
+  );
+
+  const toggleWishlistMutation = useMutation({
+    mutationFn: () => wishlistService.toggle(product._id),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["wishlist"], response);
+      toast.success(response.message);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to update wishlist");
+    },
+  });
+
+  const handleToggleWishlist = () => {
+    if (!user) {
+      toast.error("Please login to manage your wishlist");
+      return;
+    }
+    toggleWishlistMutation.mutate();
+  };
+
+  const handleAddToCart = async () => {
+    await addItem(product as any, quantity);
     toast.success(`${quantity}x ${product.nameEn || product.name} added to cart`);
   };
 
@@ -54,8 +89,19 @@ export function ProductActions({ product }: ProductActionsProps) {
         >
           <ShoppingBag className="mr-2 h-5 w-5" /> Add to Cart
         </Button>
-        <Button variant="outline" size="lg" className="rounded-xl border-border/50" aria-label="Wishlist">
-          <Heart className="h-5 w-5" />
+        <Button
+          onClick={handleToggleWishlist}
+          variant="outline"
+          size="lg"
+          className={`rounded-xl border-border/50 ${isInWishlist ? "text-accent border-accent/30 bg-accent/5" : ""}`}
+          aria-label="Wishlist"
+          disabled={toggleWishlistMutation.isPending}
+        >
+          {toggleWishlistMutation.isPending ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Heart className={`h-5 w-5 ${isInWishlist ? "fill-accent" : ""}`} />
+          )}
         </Button>
       </div>
 

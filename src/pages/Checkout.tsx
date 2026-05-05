@@ -19,7 +19,7 @@ const Checkout = () => {
 
   const handleComplete = () => {
     setCompleted(true);
-    clearCart();
+    void clearCart();
   };
 
   if (completed) {
