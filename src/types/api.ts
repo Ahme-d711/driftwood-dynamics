@@ -31,6 +31,9 @@ export interface Product {
   name: string;
   nameEn?: string;
   nameAr?: string;
+  description?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
   price: number;
   old_price: number;
   discount_percentage: number;
@@ -48,6 +51,16 @@ export interface Product {
   categoryId: string | { _id: string; nameEn: string; nameAr: string };
   addedBy: string;
   isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Review {
+  _id: string;
+  userId: string | User;
+  productId: string;
+  rating: number;
+  comment?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -22,6 +22,7 @@ interface ProductsTableProps {
   onSearchChange: (value: string) => void;
   onView: (id: string) => void;
   onEdit: (id: string) => void;
+  getCategoryLabel: (categoryId?: string | { _id?: string; name?: string; nameEn?: string }) => string;
 }
 
 export const ProductsTable = ({
@@ -32,6 +33,7 @@ export const ProductsTable = ({
   onSearchChange,
   onView,
   onEdit,
+  getCategoryLabel,
 }: ProductsTableProps) => {
   return (
     <Card className="glass-card border-border/50">
@@ -100,7 +102,9 @@ export const ProductsTable = ({
                       <span className="font-medium text-sm">{product.nameEn}</span>
                     </div>
                   </td>
-                  <td className="py-4 text-sm text-muted-foreground">{product.categoryId?.nameEn ?? "-"}</td>
+                  <td className="py-4 text-sm text-muted-foreground">
+                    {getCategoryLabel(product.categoryId as string | { _id?: string; name?: string; nameEn?: string } | undefined)}
+                  </td>
                   <td className="py-4 text-sm font-bold">${product.price.toLocaleString()}</td>
                   <td className="py-4 text-sm text-muted-foreground">{product.stock} units</td>
                   <td className="py-4">
@@ -117,7 +121,7 @@ export const ProductsTable = ({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem asChild>
-                          <Link to={`/product/${product._id}`}>
+                          <Link to={`/products/${product._id}`}>
                             <Eye className="w-4 h-4 mr-2" /> View
                           </Link>
                         </DropdownMenuItem>

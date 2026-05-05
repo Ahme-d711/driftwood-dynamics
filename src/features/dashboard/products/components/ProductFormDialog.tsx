@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProductFormState } from "./products.types";
 import { CategoryListItem } from "@/api/dashboard-management.service";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -27,6 +28,8 @@ interface ProductFormDialogProps {
   onMainImageChange: (file: File | null) => void;
   onGalleryChange: (files: File[]) => void;
   showMainImageField: boolean;
+  existingMainImageUrl?: string;
+  existingGalleryImageUrls?: string[];
 }
 
 export const ProductFormDialog = ({
@@ -43,6 +46,8 @@ export const ProductFormDialog = ({
   onMainImageChange,
   onGalleryChange,
   showMainImageField,
+  existingMainImageUrl,
+  existingGalleryImageUrls = [],
 }: ProductFormDialogProps) => {
   const MAX_GALLERY_IMAGES = 4;
   const [mainPreviewUrl, setMainPreviewUrl] = useState<string>("");
@@ -162,26 +167,32 @@ export const ProductFormDialog = ({
             <Label>Returns</Label>
             <Input value={form.returns} onChange={(e) => setForm((p) => ({ ...p, returns: e.target.value }))} placeholder="30 days" />
           </div>
-          {showMainImageField && (
-            <>
-              <div className="space-y-2 md:col-span-2">
-                <Label>Main Image</Label>
-                <Input type="file" accept="image/*" onChange={(e) => handleMainImageChange(e.target.files?.[0] ?? null)} />
-                {mainPreviewUrl && (
-                  <img
-                    src={mainPreviewUrl}
-                    alt="Main preview"
-                    className="w-32 h-32 rounded-md object-cover border border-border/50"
-                  />
-                )}
-              </div>
-            </>
-          )}
+          <div className="space-y-2 md:col-span-2">
+            <Label>Main Image</Label>
+            {showMainImageField && (
+              <Input type="file" accept="image/*" onChange={(e) => handleMainImageChange(e.target.files?.[0] ?? null)} />
+            )}
+            {mainPreviewUrl ? (
+              <img
+                src={mainPreviewUrl}
+                alt="Main preview"
+                className="w-32 h-32 rounded-md object-cover border border-border/50"
+              />
+            ) : (
+              existingMainImageUrl && (
+                <img
+                  src={resolveMediaUrl(existingMainImageUrl)}
+                  alt="Current main image"
+                  className="w-32 h-32 rounded-md object-cover border border-border/50"
+                />
+              )
+            )}
+          </div>
           <div className="space-y-2 md:col-span-2">
             <Label>Gallery Images</Label>
             <Input type="file" accept="image/*" multiple onChange={(e) => handleGalleryChange(Array.from(e.target.files ?? []))} />
             {galleryLimitError && <p className="text-xs text-amber-500">{galleryLimitError}</p>}
-            {galleryPreviewUrls.length > 0 && (
+            {galleryPreviewUrls.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {galleryPreviewUrls.map((url, idx) => (
                   <img
@@ -192,6 +203,19 @@ export const ProductFormDialog = ({
                   />
                 ))}
               </div>
+            ) : (
+              existingGalleryImageUrls.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {existingGalleryImageUrls.map((url, idx) => (
+                    <img
+                      key={`${url}-${idx}`}
+                      src={resolveMediaUrl(url)}
+                      alt={`Current gallery image ${idx + 1}`}
+                      className="w-24 h-24 rounded-md object-cover border border-border/50"
+                    />
+                  ))}
+                </div>
+              )
             )}
           </div>
         </div>

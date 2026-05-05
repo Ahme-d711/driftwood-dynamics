@@ -38,5 +38,10 @@ export const ENDPOINTS = {
     PRODUCTS: '/vendor/products',
     ORDERS: '/vendor/orders',
   },
+  REVIEWS: {
+    BASE: '/reviews',
+    BY_PRODUCT: (id: string) => `/reviews/product/${id}`,
+    TOP: '/reviews/top',
+  },
   // Add more as needed
 } as const;

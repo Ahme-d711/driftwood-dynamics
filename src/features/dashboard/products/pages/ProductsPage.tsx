@@ -64,6 +64,8 @@ export const ProductsPage = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [existingMainImageUrl, setExistingMainImageUrl] = useState<string>("");
+  const [existingGalleryImageUrls, setExistingGalleryImageUrls] = useState<string[]>([]);
   const [form, setForm] = useState<ProductFormState>(defaultProductFormState);
   const queryClient = useQueryClient();
 
@@ -102,28 +104,100 @@ export const ProductsPage = () => {
   const products = data?.data?.products ?? [];
   const categories = categoriesQuery.data?.data?.categories ?? [];
 
+  const getCategoryLabel = (
+    categoryId?: string | { _id?: string; name?: string; nameEn?: string }
+  ) => {
+    if (!categoryId) return "-";
+    if (typeof categoryId !== "string") {
+      return categoryId.name ?? categoryId.nameEn ?? "-";
+    }
+    const matchedCategory = categories.find((category) => category._id === categoryId) as
+      | { name?: string; nameEn?: string }
+      | undefined;
+    return matchedCategory?.name ?? matchedCategory?.nameEn ?? "-";
+  };
+
   const openViewDialog = (id: string) => {
     setSelectedProductId(id);
     setViewOpen(true);
   };
 
-  const openEditDialog = (id: string) => {
-    const current = products.find((p) => p._id === id);
-    if (current) {
-      setForm({
-        ...defaultProductFormState,
-        name: current.nameEn,
-        nameEn: current.nameEn,
-        nameAr: current.nameAr,
-        price: current.price,
-        stock: current.stock,
-        inStock: current.stock > 0,
-        categoryId: current.categoryId?._id ?? "",
-        isShow: current.isShow,
-      });
-    }
+  const openEditDialog = async (id: string) => {
     setSelectedProductId(id);
     setEditOpen(true);
+
+    try {
+      const response = await dashboardManagementService.getProductById(id);
+      const product = response?.data?.product as {
+        name?: string;
+        nameEn?: string;
+        nameAr?: string;
+        price?: number;
+        old_price?: number;
+        stock?: number;
+        is_best_seller?: boolean;
+        categoryId?: string | { _id?: string };
+        features?: {
+          battery_life?: string;
+          noise_cancelling?: boolean;
+          audio?: string[];
+        };
+        shipping?: {
+          free_shipping?: boolean;
+          condition?: string;
+        };
+        warranty?: string;
+        returns?: string;
+        images?: {
+          main?: string;
+          gallery?: string[];
+        };
+      };
+
+      const resolvedCategoryId =
+        typeof product?.categoryId === "string"
+          ? product.categoryId
+          : product?.categoryId?._id ?? "";
+
+      setForm({
+        ...defaultProductFormState,
+        name: product?.name ?? product?.nameEn ?? "",
+        nameEn: product?.nameEn ?? product?.name ?? "",
+        nameAr: product?.nameAr ?? product?.name ?? "",
+        price: product?.price ?? 0,
+        originalPrice: product?.old_price ?? 0,
+        stock: product?.stock ?? 0,
+        inStock: (product?.stock ?? 0) > 0,
+        isBestSeller: product?.is_best_seller ?? false,
+        batteryLife: product?.features?.battery_life ?? "",
+        noiseCancelling: product?.features?.noise_cancelling ?? false,
+        audioFeatures: (product?.features?.audio ?? []).join(", "),
+        freeShipping: product?.shipping?.free_shipping ?? false,
+        shippingCondition: product?.shipping?.condition ?? "",
+        warranty: product?.warranty ?? "",
+        returns: product?.returns ?? "",
+        categoryId: resolvedCategoryId,
+      });
+      setExistingMainImageUrl(product?.images?.main ?? "");
+      setExistingGalleryImageUrls(product?.images?.gallery ?? []);
+    } catch {
+      const current = products.find((p) => p._id === id);
+      if (current) {
+        setForm({
+          ...defaultProductFormState,
+          name: current.nameEn,
+          nameEn: current.nameEn,
+          nameAr: current.nameAr,
+          price: current.price,
+          stock: current.stock,
+          inStock: current.stock > 0,
+          categoryId: current.categoryId?._id ?? "",
+          isShow: current.isShow,
+        });
+        setExistingMainImageUrl(current.mainImage ?? "");
+        setExistingGalleryImageUrls([]);
+      }
+    }
   };
 
   const submitAddProduct = () => {
@@ -151,6 +225,7 @@ export const ProductsPage = () => {
           onSearchChange={setSearch}
           onView={openViewDialog}
           onEdit={openEditDialog}
+          getCategoryLabel={getCategoryLabel}
         />
       </div>
 
@@ -175,6 +250,8 @@ export const ProductsPage = () => {
         onMainImageChange={setMainImageFile}
         onGalleryChange={setGalleryFiles}
         showMainImageField
+        existingMainImageUrl=""
+        existingGalleryImageUrls={[]}
       />
 
       <ProductFormDialog
@@ -191,6 +268,8 @@ export const ProductsPage = () => {
         onMainImageChange={setMainImageFile}
         onGalleryChange={setGalleryFiles}
         showMainImageField={false}
+        existingMainImageUrl={existingMainImageUrl}
+        existingGalleryImageUrls={existingGalleryImageUrls}
       />
     </DashboardLayout>
   );
