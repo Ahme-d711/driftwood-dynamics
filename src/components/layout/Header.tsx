@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Search, Menu, X, User } from "lucide-react";
 import { useCart } from "@/features/cart/CartProvider";
 import { ThemeToggle } from "../ThemeToggle";
+import { useAuthStore } from "@/store/use-auth-store";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -12,6 +13,11 @@ const navLinks = [
 ];
 
 export function Header() {
+  const { user } = useAuthStore();
+  const allLinks = user?.role === "admin" 
+    ? [...navLinks, { label: "Dashboard", path: "/dashboard" }] 
+    : navLinks;
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems } = useCart();
   const location = useLocation();
@@ -31,7 +37,7 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {allLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
@@ -87,7 +93,7 @@ export function Header() {
               className="md:hidden overflow-hidden border-t border-border/30"
             >
               <nav className="section-padding py-4 flex flex-col gap-3">
-                {navLinks.map((link) => (
+                {allLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}

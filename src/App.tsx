@@ -24,6 +24,7 @@ const DashboardUsers = lazy(() => import("./pages/dashboard/DashboardUsers"));
 const DashboardCategories = lazy(() => import("./pages/dashboard/DashboardCategories"));
 const DashboardOrders = lazy(() => import("./pages/dashboard/DashboardOrders"));
 const DashboardSettings = lazy(() => import("./pages/dashboard/DashboardSettings"));
+const ProtectedRoute = lazy(() => import("./components/auth/ProtectedRoute"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -56,12 +57,54 @@ const App = () => (
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/profile" element={<Profile />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/dashboard/products" element={<DashboardProducts />} />
-                  <Route path="/dashboard/customers" element={<DashboardUsers />} />
-                  <Route path="/dashboard/categories" element={<DashboardCategories />} />
-                  <Route path="/dashboard/orders" element={<DashboardOrders />} />
-                  <Route path="/dashboard/settings" element={<DashboardSettings />} />
+                  <Route 
+                    path="/dashboard" 
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard/products" 
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <DashboardProducts />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard/customers" 
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <DashboardUsers />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard/categories" 
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <DashboardCategories />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard/orders" 
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <DashboardOrders />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard/settings" 
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <DashboardSettings />
+                      </ProtectedRoute>
+                    } 
+                  />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
